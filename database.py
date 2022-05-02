@@ -3,10 +3,10 @@ import mysql.connector
 # connect to database on local host with login
 def connect():
     mydb = mysql.connector.connect(
-        host="localhost",
-        user="finn244",
+        host="secret",
+        user="secret",
         password="secret",
-        database="finance"
+        database="financeDB"
     )
 
     return mydb
@@ -24,7 +24,7 @@ def insertIntoStockTable(ticker, company):
 
     cur = conn.cursor()
 
-    sql = f"""INSERT INTO stocktable (ticker, company)
+    sql = f"""INSERT INTO stockTable(ticker, company)
             VALUES('{ticker}', '{company}');
             """
     cur.execute(sql)
@@ -33,8 +33,7 @@ def insertIntoStockTable(ticker, company):
 
 import pandas as pd
 # creates a single record in the database
-def insertIntoStockPrices(record, id):
-    conn = connect()
+def insertIntoStockPrices(record, id, conn):
 
 
     date = record.name.date()
@@ -48,21 +47,20 @@ def insertIntoStockPrices(record, id):
     low = record.low
     close = record.close
     volume = int(record.volume)
-    print(date, open, high, low, close, volume)
+    print(id + 1, date, open, high, low, close, volume)
 
 
     # columns of the database
-    sql = f''' INSERT INTO stockprices(id, date, open, high, low, close, volume)
+    sql = f''' INSERT INTO stockPrices(id, date, open, high, low, close, volume)
               VALUES({id + 1}, '{date}',{open},{high},{low},{close},{volume}) ''' # for some reason volume can only be inserted in this way with an f string
 
     cur = conn.cursor()
     cur.execute(sql)
-    conn.commit()
 
 
 # insert record into the PETable
-def insertIntoPETable(record, id):
-    conn = connect()
+def insertIntoPETable(record, id, conn):
+
 
     date = record[0]
 
@@ -75,16 +73,15 @@ def insertIntoPETable(record, id):
 
     print(date, eps, pe)
 
-    sql = f''' INSERT INTO petable(id, date, eps, pe)
+    sql = f''' INSERT INTO peTable(id, date, eps, pe)
                values({id+1}, '{date}', {eps}, {pe});'''
 
     cur = conn.cursor()
     cur.execute(sql)
-    conn.commit()
 
 
-def insertIntoPSTable(record, id):
-    conn = connect()
+
+def insertIntoPSTable(record, id, conn):
 
     date = record[0]
     sps = record[2][1:]
@@ -93,13 +90,13 @@ def insertIntoPSTable(record, id):
 
     print(id+1, date, ps, sps)
 
-    sql = f'''INSERT INTO pstable(id, date, psRatio, sps)
+    sql = f'''INSERT INTO psTable(id, date, psRatio, sps)
               VALUES({id + 1}, '{date}', {ps}, {sps})
     '''
 
     cur = conn.cursor()
     cur.execute(sql)
-    conn.commit()
+
 
 
 
@@ -112,7 +109,7 @@ def select_all_stocks():
     """
     conn = connect()
     cur = conn.cursor()
-    cur.execute("SELECT ticker FROM stocktable")
+    cur.execute("SELECT ticker FROM stockTable")
 
     rows = cur.fetchall()
 
@@ -121,7 +118,7 @@ def select_all_stocks():
 def select_all_companies():
     conn = connect()
     cur = conn.cursor()
-    cur.execute("SELECT company from stocktable")
+    cur.execute("SELECT company from stockTable")
 
     rows = cur.fetchall()
 

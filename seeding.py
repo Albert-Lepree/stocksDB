@@ -16,7 +16,7 @@ def seedStockTable():
 
         database.insertIntoStockTable(topMarketCap.iloc[i,0], topMarketCap.iloc[i,1])
 
-def seedStockPrices():
+def seedStockPrices(conn, inclusive, exclusive):
     tickers = database.select_all_stocks()
     tickerList = []
 
@@ -25,11 +25,13 @@ def seedStockPrices():
 
 
 
-    for j in range(5, len(tickerList)):
+    for j in range(len(tickerList)):
         df = fp.historical_prices(tickerList[j])
         for i in range(len(df)):
-            database.insertIntoStockPrices(df.iloc[i], j)
+            database.insertIntoStockPrices(df.iloc[i], j, conn)
 
+
+        conn.commit()
         print('Completed: ', tickerList[j])
         c = input("continue?(y/n)")
         if c == 'y':
@@ -37,30 +39,35 @@ def seedStockPrices():
         else:
             break
 
+
 # fill pe table with data
-def seedPETable():
+def seedPETable(conn):
     tickerList = getTickers()
     companyList = getCompanies()
 
 
-    #formats string to be used in url
+
     for i in range(len(companyList)):
 
         url = f'https://www.macrotrends.net/stocks/charts/{tickerList[i]}/{companyList[i]}/pe-ratio'
+
+        print('Ticker: ', tickerList[i])
 
         df = pd.read_html(url)[0] # date, stockprice, eps, pe
 
         for j in range(1, len(df)):
             #print(df.iloc[j])
-            database.insertIntoPETable(df.iloc[j], i)
+            database.insertIntoPETable(df.iloc[j], i, conn)
+
+        conn.commit()
 
 
-def seedPSTable():
+def seedPSTable(conn):
     tickerList = getTickers()
     companyList = getCompanies()
 
 
-    for j in range(1, len(tickerList)):
+    for j in range(len(tickerList)):
 
         url = f'https://www.macrotrends.net/stocks/charts/{tickerList[j]}/{companyList[j]}/price-sales'
         print(url)
@@ -72,7 +79,9 @@ def seedPSTable():
             continue
 
         for i in range(1, len(df)):
-            database.insertIntoPSTable(df.iloc[i], j)
+            database.insertIntoPSTable(df.iloc[i], j, conn)
+
+        conn.commit()
 
 
 def getCompanies():

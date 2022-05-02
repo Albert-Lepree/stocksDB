@@ -1,9 +1,14 @@
+import database
 import seeding
-
+import threading
 
 def main():
 
-    print('hello World')
+    conn = database.connect()
+
+    seeding.seedStockPrices(conn)
+
+
 
 
 
