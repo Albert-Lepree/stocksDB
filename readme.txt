@@ -1,6 +1,6 @@
 Stock database project
 
-test1
+test2
 
 Seeding:
     these functions are used to fill the database using web scraper via macrotrends.net
