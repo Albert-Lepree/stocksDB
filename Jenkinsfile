@@ -11,8 +11,7 @@ pipeline {
         stage('Update stocksDB') {
             steps {
                 echo 'updating /app/seed/stocksDB'
-                sh 'whoami'
-                sh 'git -C /app/seed/stocksDB pull'
+                sh 'ssh -i /.ssh/finniscool.pem ubuntu@ec2-18-234-190-54.compute-1.amazonaws.com sudo git -C /app/seed/stocksDB pull'
             }
         }
     }
